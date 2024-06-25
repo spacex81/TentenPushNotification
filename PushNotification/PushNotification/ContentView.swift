@@ -1,24 +1,47 @@
-//
-//  ContentView.swift
-//  PushNotification
-//
-//  Created by jo on 6/23/24.
-//
-
 import SwiftUI
+import FirebaseFirestore
+import FirebaseAuth
+
+
+// start with sending simple alert type push notification
+// then send push-to-talk push notification
+// then add livekit feature 
 
 struct ContentView: View {
+    @State private var isUserLoggedIn = false
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        if isUserLoggedIn {
+            HomeView(isUserLoggedIn: $isUserLoggedIn)
+        } else {
+            AuthView(isUserLoggedIn: $isUserLoggedIn)
+                .onAppear {
+                    self.checkAuthentication()
+                }
         }
-        .padding()
+    }
+    
+    private func checkAuthentication() {
+        if Auth.auth().currentUser != nil {
+            isUserLoggedIn = true
+        } else {
+            isUserLoggedIn = false
+        }
     }
 }
 
 #Preview {
     ContentView()
 }
+
+//import SwiftUI
+//
+//struct ContentView: View {
+//    var body: some View {
+//        Text("Push Notification")
+//    }
+//}
+//
+//#Preview {
+//    ContentView()
+//}

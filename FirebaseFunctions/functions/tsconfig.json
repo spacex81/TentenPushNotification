@@ -1,0 +1,33 @@
+// default config
+// {
+//   "compilerOptions": {
+//     "module": "commonjs",
+//     "noImplicitReturns": true,
+//     "noUnusedLocals": true,
+//     "outDir": "lib",
+//     "sourceMap": true,
+//     "strict": true,
+//     "target": "es2017"
+//   },
+//   "compileOnSave": true,
+//   "include": [
+//     "src"
+//   ]
+// }
+
+// gpt recommended config
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "lib": ["es6"],
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "lib",
+    "rootDir": "src",
+    "strict": true,
+    "esModuleInterop": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}
