@@ -26,10 +26,11 @@ struct ShowAddViewButton: View {
 }
 
 struct FriendsScrollView: View {
-    @State private var lastSnappedIndex: Int? = nil
     @Binding var showAddView: Bool
     @Binding var selectedProfileImageUrl: String?
+    @Binding var lastSnappedIndex: Int?
     @StateObject var friendViewModel: FriendViewModel
+    
     let circleSize: CGFloat
     let cameraStrokeSize: CGFloat
     
@@ -110,17 +111,11 @@ struct FriendsScrollView: View {
                 }
                 .scrollTargetLayout()
                 .padding(.horizontal, (UIScreen.main.bounds.width - circleSize) / 2)
-//                .padding(.horizontal, UIScreen.main.bounds.width / 2)
-
             }
             .scrollTargetBehavior(.viewAligned)
             .onReceive(friendViewModel.$friends) { friends in
-                // without this delay, scrollTo will not work
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     if let firstFriend = friends.first {
-                        // because of some positioning issue, if we use 'scroll to center' it is positioned a little bit right
-//                        scrollProxy.scrollTo(firstFriend.id, anchor: .center)
-                        // this hard coded value is stupid 
                         scrollProxy.scrollTo(firstFriend.id, anchor: UnitPoint(x: 0.43, y: 0.5))
 
                         if let profileImageUrl = firstFriend.profileImageUrl {
@@ -157,6 +152,7 @@ struct HomeView: View {
     @State private var profileImageUrl: String?
     @State private var pin: String?
     @State private var selectedProfileImageUrl: String?
+    @State private var lastSnappedIndex: Int? 
     @StateObject private var friendViewModel = FriendViewModel()
     
     let cameraStrokeSize = 120.0
@@ -178,10 +174,10 @@ struct HomeView: View {
                             .aspectRatio(contentMode: .fill)
                             .frame(width: geometry.size.width, height: geometry.size.height)
                     } else {
-                        Image("profile_0")
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: geometry.size.width, height: geometry.size.height)
+//                        Image(systemName: "person.crop.circle")
+//                            .resizable()
+//                            .aspectRatio(contentMode: .fill)
+//                            .frame(width: geometry.size.width, height: geometry.size.height)
                     }
                     VStack {
                         Spacer()
@@ -189,6 +185,7 @@ struct HomeView: View {
                             FriendsScrollView(
                                 showAddView: $showAddView,
                                 selectedProfileImageUrl: $selectedProfileImageUrl,
+                                lastSnappedIndex: $lastSnappedIndex,
                                 friendViewModel: friendViewModel,
                                 circleSize: circleSize,
                                 cameraStrokeSize: cameraStrokeSize
@@ -212,9 +209,18 @@ struct HomeView: View {
                     self.selectedProfileImageUrl = profileImageUrl
                 }
             }
+            .onChange(of: lastSnappedIndex) { oldValue, newValue in
+                print("lastSnappedIndex changed to : \(String(describing: lastSnappedIndex))")
+                if lastSnappedIndex != nil {
+                    let receiverFcmToken = friendViewModel.friends[lastSnappedIndex!].fcmToken
+                    print("receiverFcmToken: \(String(describing: receiverFcmToken))")
+                } else {
+                    print("lastSnappedIndex is nil")
+                }
+            }
         }
         .sheet(isPresented: $showAddView) {
-            AddView(profileImageUrl: profileImageUrl, pin: pin)
+            AddView(profileImageUrl: profileImageUrl, pin: pin, isUserLoggedIn: $isUserLoggedIn)
         }
     }
     
@@ -244,6 +250,7 @@ struct HomeView: View {
         }
     }
 }
+
 
 #Preview {
     HomeView(isUserLoggedIn: .constant(true), friendViewModel: FriendViewModel(sampleData: true))

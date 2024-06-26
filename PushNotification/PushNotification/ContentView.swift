@@ -2,7 +2,6 @@ import SwiftUI
 import FirebaseFirestore
 import FirebaseAuth
 
-
 // start with sending simple alert type push notification
 // then send push-to-talk push notification
 // then add livekit feature 
@@ -17,7 +16,7 @@ struct ContentView: View {
             AuthView(isUserLoggedIn: $isUserLoggedIn)
                 .onAppear {
                     self.checkAuthentication()
-                }
+            }
         }
     }
     
@@ -34,14 +33,3 @@ struct ContentView: View {
     ContentView()
 }
 
-//import SwiftUI
-//
-//struct ContentView: View {
-//    var body: some View {
-//        Text("Push Notification")
-//    }
-//}
-//
-//#Preview {
-//    ContentView()
-//}
