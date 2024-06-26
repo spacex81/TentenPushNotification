@@ -89,7 +89,7 @@ struct FriendsScrollView: View {
                                         }
                                     }
                             } else {
-//                                Image("profile_\(index + 2)") // these chunk is for preview
+//                                Image("profile_\(index + 2)") // these chunk is for preview. We will delte this else part 
 //                                    .resizable()
 //                                    .scaledToFill()
 //                                    .frame(width: circleSize, height: circleSize)

@@ -1,7 +1,7 @@
 import PushToTalk
-import UIKit
 import AVFoundation
 import LiveKit
+import UIKit
 
 class AudioStreamManager: NSObject, PTChannelManagerDelegate, PTChannelRestorationDelegate {
     static let shared = AudioStreamManager()
@@ -33,50 +33,49 @@ class AudioStreamManager: NSObject, PTChannelManagerDelegate, PTChannelRestorati
         channelManager.requestJoinChannel(channelUUID: channelUUID, descriptor: channelDescriptor)
     }
     
-    // functions for channel manager delegate
+    // PTChannelManagerDelegate method
     func channelManager(_ channelManager: PTChannelManager, didJoinChannel channelUUID: UUID, reason: PTChannelJoinReason) {
-        print("channelManager-didJoinChannel")
-    }
-    
-    func channelManager(_ channelManager: PTChannelManager, didLeaveChannel channelUUID: UUID, reason: PTChannelLeaveReason) {
-        print("channelManager-didLeaveChannel")
-    }
-    
-    func channelManager(_ channelManager: PTChannelManager, channelUUID: UUID, didBeginTransmittingFrom source: PTChannelTransmitRequestSource) {
-        print("channelManager-didBeginTransmittingFrom")
-    }
-    
-    func channelManager(_ channelManager: PTChannelManager, channelUUID: UUID, didEndTransmittingFrom source: PTChannelTransmitRequestSource) {
-        print("channelManager-didEndTransmittingFrom")
+        print("1-channelManager-didJoinChannel")
     }
     
     func channelManager(_ channelManager: PTChannelManager, receivedEphemeralPushToken pushToken: Data) {
-        print("channelManager-receivedEphemeralPushToken")
+        print("2-channelManager-receivedEphemeralPushToken")
+    }
+
+    func channelManager(_ channelManager: PTChannelManager, channelUUID: UUID, didBeginTransmittingFrom source: PTChannelTransmitRequestSource) {
+        print("3-channelManager-didBeginTransmittingFrom")
     }
     
+    func channelManager(_ channelManager: PTChannelManager, channelUUID: UUID, didEndTransmittingFrom source: PTChannelTransmitRequestSource) {
+        print("4-channelManager-didEndTransmittingFrom")
+    }
     
-       func incomingPushResult(channelManager: PTChannelManager, channelUUID: UUID, pushPayload: [String : Any]) -> PTPushResult {
-           // Default implementation to pass the build
-           print("Incoming push result for channel: \(channelUUID)")
-           return PTPushResult.leaveChannel
-       }
-       
-       func channelManager(_ channelManager: PTChannelManager, didActivate audioSession: AVAudioSession) {
-           // Default implementation to pass the build
-           print("Activated audio session")
-       }
-       
-       func channelManager(_ channelManager: PTChannelManager, didDeactivate audioSession: AVAudioSession) {
-           // Default implementation to pass the build
-           print("Deactivated audio session")
-       }
-       
-       // PTChannelRestorationDelegate method
-       func channelDescriptor(restoredChannelUUID channelUUID: UUID) -> PTChannelDescriptor {
-           // Default implementation to pass the build
-           let channelImage = UIImage(named: "profile_0")
-           return PTChannelDescriptor(name: "Restored Channel", image: channelImage)
-       }
+    func channelManager(_ channelManager: PTChannelManager, didLeaveChannel channelUUID: UUID, reason: PTChannelLeaveReason) {
+        print("5-channelManager-didLeaveChannel")
+    }
+
+    func incomingPushResult(channelManager: PTChannelManager, channelUUID: UUID, pushPayload: [String : Any]) -> PTPushResult {
+       // Default implementation to pass the build
+       print("Incoming push result for channel: \(channelUUID)")
+       return PTPushResult.leaveChannel
+    }
+   
+    func channelManager(_ channelManager: PTChannelManager, didActivate audioSession: AVAudioSession) {
+       // Default implementation to pass the build
+       print("Activated audio session")
+    }
+   
+    func channelManager(_ channelManager: PTChannelManager, didDeactivate audioSession: AVAudioSession) {
+       // Default implementation to pass the build
+       print("Deactivated audio session")
+    }
+   
+    // PTChannelRestorationDelegate method
+    func channelDescriptor(restoredChannelUUID channelUUID: UUID) -> PTChannelDescriptor {
+       // Default implementation to pass the build
+       let channelImage = UIImage(named: "profile_0")
+       return PTChannelDescriptor(name: "Restored Channel", image: channelImage)
+    }
 
 }
 

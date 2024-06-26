@@ -1,13 +1,5 @@
-//
-//  sendPushNotification.swift
-//  PushNotification
-//
-//  Created by 조윤근 on 6/26/24.
-//
-
 import Foundation
 
-// need to add uid 
 func sendPushNotification(to fcmToken: String, senderUid: String, receiverUid: String) {
     guard let url = URL(string: "https://us-central1-tentenios.cloudfunctions.net/sendPushNotification") else {
         print("Invalid URL")
