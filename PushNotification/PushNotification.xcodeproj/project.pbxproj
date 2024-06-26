@@ -10,6 +10,7 @@
 		C84202BB2C29AC6700CBC804 /* FriendsScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84202BA2C29AC6700CBC804 /* FriendsScrollView.swift */; };
 		C84202C22C2A5F5000CBC804 /* LiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = C84202C12C2A5F5000CBC804 /* LiveKit */; };
 		C85D606C2C2BCD0500BD0B9B /* sendPushNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85D606B2C2BCD0500BD0B9B /* sendPushNotification.swift */; };
+		C85D606E2C2BE39000BD0B9B /* AudioStreamManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85D606D2C2BE39000BD0B9B /* AudioStreamManager.swift */; };
 		C876A97F2C290EF000CED736 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C876A97E2C290EF000CED736 /* GoogleService-Info.plist */; };
 		C876A9812C29130F00CED736 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C876A9802C29130F00CED736 /* AuthView.swift */; };
 		C876A9832C29138D00CED736 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C876A9822C29138D00CED736 /* HomeView.swift */; };
@@ -41,6 +42,7 @@
 /* Begin PBXFileReference section */
 		C84202BA2C29AC6700CBC804 /* FriendsScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsScrollView.swift; sourceTree = "<group>"; };
 		C85D606B2C2BCD0500BD0B9B /* sendPushNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = sendPushNotification.swift; sourceTree = "<group>"; };
+		C85D606D2C2BE39000BD0B9B /* AudioStreamManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioStreamManager.swift; sourceTree = "<group>"; };
 		C876A97E2C290EF000CED736 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C876A9802C29130F00CED736 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		C876A9822C29138D00CED736 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -145,6 +147,7 @@
 				C878BAED2C2800970005AA85 /* Assets.xcassets */,
 				C878BAEF2C2800970005AA85 /* Preview Content */,
 				C85D606B2C2BCD0500BD0B9B /* sendPushNotification.swift */,
+				C85D606D2C2BE39000BD0B9B /* AudioStreamManager.swift */,
 			);
 			path = PushNotification;
 			sourceTree = "<group>";
@@ -258,6 +261,7 @@
 				C876A9852C29163800CED736 /* UserModel.swift in Sources */,
 				C876A9AF2C2948DD00CED736 /* PinButton.swift in Sources */,
 				C85D606C2C2BCD0500BD0B9B /* sendPushNotification.swift in Sources */,
+				C85D606E2C2BE39000BD0B9B /* AudioStreamManager.swift in Sources */,
 				C876A9B82C297E3200CED736 /* FriendViewModel.swift in Sources */,
 				C876A9812C29130F00CED736 /* AuthView.swift in Sources */,
 				C84202BB2C29AC6700CBC804 /* FriendsScrollView.swift in Sources */,
