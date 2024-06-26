@@ -30,7 +30,6 @@ struct FriendsScrollView: View {
     @Binding var selectedProfileImageUrl: String?
     @Binding var lastSnappedIndex: Int?
     @StateObject var friendViewModel: FriendViewModel
-    
     let circleSize: CGFloat
     let cameraStrokeSize: CGFloat
     
