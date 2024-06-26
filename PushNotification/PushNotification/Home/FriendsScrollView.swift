@@ -31,7 +31,11 @@ struct FriendsScrollView: View {
     @Binding var selectedProfileImageUrl: String?
     @Binding var lastSnappedIndex: Int?
     @Binding var receiverFcmToken: String?
+    @Binding var senderUid: String?
+    @State private var receiverUid: String?
+    
     @StateObject var friendViewModel: FriendViewModel
+    
     let circleSize: CGFloat
     let cameraStrokeSize: CGFloat
     
@@ -70,6 +74,8 @@ struct FriendsScrollView: View {
                                             if lastSnappedIndex != index {
                                                 lastSnappedIndex = index
                                                 selectedProfileImageUrl = profileImageUrl
+                                                receiverUid = friend.uid
+                                                
                                                 let generator = UIImpactFeedbackGenerator(style: .medium)
                                                 generator.impactOccurred()
                                             }
@@ -77,13 +83,13 @@ struct FriendsScrollView: View {
                                     }
                                     .onTapGesture {
                                         if let token = receiverFcmToken {
-                                            sendPushNotification(to: token)
+                                            sendPushNotification(to: token, senderUid: senderUid ?? "", receiverUid: receiverUid ?? "")
                                         } else {
                                             print("No FCM token available")
                                         }
                                     }
                             } else {
-//                                Image("profile_\(index + 2)")
+//                                Image("profile_\(index + 2)") // these chunk is for preview
 //                                    .resizable()
 //                                    .scaledToFill()
 //                                    .frame(width: circleSize, height: circleSize)
@@ -130,6 +136,12 @@ struct FriendsScrollView: View {
                             selectedProfileImageUrl = profileImageUrl
                         } else {
                             selectedProfileImageUrl = nil
+                        }
+                        
+                        if let receiverUid = firstFriend.uid as String? {
+                            self.receiverUid = receiverUid
+                        } else {
+                            self.receiverUid = nil
                         }
                     }
                 }

@@ -38,11 +38,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        print("willPresent notification: \(notification.request.content.userInfo)")
-        //
+        
         let userInfo = notification.request.content.userInfo
         handlePushNotification(userInfo: userInfo)
-        //
 
         if #available(iOS 14.0, *) {
             completionHandler([.banner, .badge, .sound])
@@ -52,8 +50,11 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     }
     
     private func handlePushNotification(userInfo: [AnyHashable: Any]) {
-        print("handlePushNotification()")
-        
+        print(userInfo)
+        print("Push Notification received!")
+        print("channelUUID: \(String(describing: userInfo["channelUUID"]))")
+        print("livekitToken: \(String(describing: userInfo["livekitToken"]))")
+
         guard let channelUUIDString = userInfo["channelUUID"] as? String,
               let channelUUID = UUID(uuidString: channelUUIDString) else {
             print("Invalid or missing channelUUID")

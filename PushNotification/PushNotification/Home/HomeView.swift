@@ -7,6 +7,7 @@ import Combine
 struct HomeView: View {
     @Binding var isUserLoggedIn: Bool
     @State private var showAddView = false
+    @State private var senderUid: String?
     @State private var profileImageUrl: String?
     @State private var pin: String?
     @State private var selectedProfileImageUrl: String?
@@ -48,6 +49,7 @@ struct HomeView: View {
                                 selectedProfileImageUrl: $selectedProfileImageUrl,
                                 lastSnappedIndex: $lastSnappedIndex,
                                 receiverFcmToken: $receiverFcmToken,
+                                senderUid: $senderUid,
                                 friendViewModel: friendViewModel,
                                 circleSize: circleSize,
                                 cameraStrokeSize: cameraStrokeSize
@@ -95,6 +97,8 @@ struct HomeView: View {
     
     private func fetchUserData() {
         guard let uid = Auth.auth().currentUser?.uid else { return }
+        self.senderUid = uid
+        
         let db = Firestore.firestore()
         db.collection("users").document(uid).getDocument { document, error in
             if let document = document, document.exists {

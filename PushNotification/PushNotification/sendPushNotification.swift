@@ -7,7 +7,8 @@
 
 import Foundation
 
-func sendPushNotification(to fcmToken: String) {
+// need to add uid 
+func sendPushNotification(to fcmToken: String, senderUid: String, receiverUid: String) {
     guard let url = URL(string: "https://us-central1-tentenios.cloudfunctions.net/sendPushNotification") else {
         print("Invalid URL")
         return
@@ -17,7 +18,11 @@ func sendPushNotification(to fcmToken: String) {
     request.httpMethod = "POST"
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
     
-    let body: [String: Any] = ["fcmToken": fcmToken]
+    let body: [String: Any] = [
+        "fcmToken": fcmToken,
+        "senderUid": senderUid,
+        "receiverUid": receiverUid
+    ]
     
     do {
         request.httpBody = try JSONSerialization.data(withJSONObject: body, options: .fragmentsAllowed)
