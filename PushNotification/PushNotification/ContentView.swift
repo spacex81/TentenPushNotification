@@ -3,6 +3,7 @@ import FirebaseFirestore
 import FirebaseAuth
 
 // start with sending simple alert type push notification
+// receive push notification in background/foreground
 // then send push-to-talk push notification
 // then add livekit feature 
 

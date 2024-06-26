@@ -23,7 +23,7 @@ class FriendViewModel: ObservableObject {
         }
     }
     
-    func fetchFriends() {
+    func fetchFriends(completion:  (() -> Void)? = nil) {
         guard let userUID = Auth.auth().currentUser?.uid else {
             print("No user is currently signed in.")
             return
@@ -44,6 +44,7 @@ class FriendViewModel: ObservableObject {
                 let userModel = try document.data(as: UserModel.self)
 
                 self.friends = userModel.friends
+                completion?()
             } catch let error {
                 print("Error decoding user model: \(error)")
             }

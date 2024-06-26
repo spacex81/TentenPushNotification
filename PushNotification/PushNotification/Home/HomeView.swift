@@ -2,6 +2,7 @@ import SwiftUI
 import SDWebImageSwiftUI
 import FirebaseAuth
 import FirebaseFirestore
+import Combine
 
 struct ShowAddViewButton: View {
     @Binding var showAddView: Bool
@@ -29,6 +30,7 @@ struct FriendsScrollView: View {
     @Binding var showAddView: Bool
     @Binding var selectedProfileImageUrl: String?
     @Binding var lastSnappedIndex: Int?
+    @Binding var receiverFcmToken: String?
     @StateObject var friendViewModel: FriendViewModel
     let circleSize: CGFloat
     let cameraStrokeSize: CGFloat
@@ -73,24 +75,31 @@ struct FriendsScrollView: View {
                                             }
                                         }
                                     }
-                            } else {
-                                Image("profile_\(index + 2)")
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: circleSize, height: circleSize)
-                                    .clipShape(Circle())
-                                    .scaleEffect(scale)
-                                    .onChange(of: geometry.frame(in: .global).midX) { newValue, oldValue in
-                                        let screenMidX = UIScreen.main.bounds.width / 2
-                                        if abs(newValue - screenMidX) < 70 {
-                                            if lastSnappedIndex != index {
-                                                lastSnappedIndex = index
-                                                selectedProfileImageUrl = nil
-                                                let generator = UIImpactFeedbackGenerator(style: .medium)
-                                                generator.impactOccurred()
-                                            }
+                                    .onTapGesture {
+                                        if let token = receiverFcmToken {
+                                            sendPushNotification(to: token)
+                                        } else {
+                                            print("No FCM token available")
                                         }
                                     }
+                            } else {
+//                                Image("profile_\(index + 2)")
+//                                    .resizable()
+//                                    .scaledToFill()
+//                                    .frame(width: circleSize, height: circleSize)
+//                                    .clipShape(Circle())
+//                                    .scaleEffect(scale)
+//                                    .onChange(of: geometry.frame(in: .global).midX) { newValue, oldValue in
+//                                        let screenMidX = UIScreen.main.bounds.width / 2
+//                                        if abs(newValue - screenMidX) < 70 {
+//                                            if lastSnappedIndex != index {
+//                                                lastSnappedIndex = index
+//                                                selectedProfileImageUrl = nil
+//                                                let generator = UIImpactFeedbackGenerator(style: .medium)
+//                                                generator.impactOccurred()
+//                                            }
+//                                        }
+//                                    }
                             }
                         }
                         .frame(width: circleSize, height: circleSize)
@@ -115,7 +124,7 @@ struct FriendsScrollView: View {
             .onReceive(friendViewModel.$friends) { friends in
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     if let firstFriend = friends.first {
-                        scrollProxy.scrollTo(firstFriend.id, anchor: UnitPoint(x: 0.43, y: 0.5))
+                        scrollProxy.scrollTo(firstFriend.id, anchor: UnitPoint(x: 0.5, y: 0.5))
 
                         if let profileImageUrl = firstFriend.profileImageUrl {
                             selectedProfileImageUrl = profileImageUrl
@@ -152,7 +161,10 @@ struct HomeView: View {
     @State private var pin: String?
     @State private var selectedProfileImageUrl: String?
     @State private var lastSnappedIndex: Int? 
+    @State private var receiverFcmToken: String?
     @StateObject private var friendViewModel = FriendViewModel()
+    private var cancellables = Set<AnyCancellable>()
+
     
     let cameraStrokeSize = 120.0
     
@@ -185,6 +197,7 @@ struct HomeView: View {
                                 showAddView: $showAddView,
                                 selectedProfileImageUrl: $selectedProfileImageUrl,
                                 lastSnappedIndex: $lastSnappedIndex,
+                                receiverFcmToken: $receiverFcmToken,
                                 friendViewModel: friendViewModel,
                                 circleSize: circleSize,
                                 cameraStrokeSize: cameraStrokeSize
@@ -201,7 +214,14 @@ struct HomeView: View {
             .edgesIgnoringSafeArea(.all)
             .onAppear {
                 fetchUserData()
-                friendViewModel.fetchFriends()
+                friendViewModel.fetchFriends() {
+                    if friendViewModel.friends.count > 0 {
+                        lastSnappedIndex = 0
+                        receiverFcmToken = friendViewModel.friends[0].fcmToken
+                        print("initial lastSnappedIndex: \(String(describing: lastSnappedIndex))")
+                        print("initial receiverFcmToken: \(String(describing: receiverFcmToken))")
+                    }
+                }
             }
             .onReceive(friendViewModel.$friends) { friends in
                 if let firstFriend = friends.first, let profileImageUrl = firstFriend.profileImageUrl {
@@ -211,7 +231,8 @@ struct HomeView: View {
             .onChange(of: lastSnappedIndex) { oldValue, newValue in
                 print("lastSnappedIndex changed to : \(String(describing: lastSnappedIndex))")
                 if lastSnappedIndex != nil {
-                    let receiverFcmToken = friendViewModel.friends[lastSnappedIndex!].fcmToken
+//                    let receiverFcmToken = friendViewModel.friends[lastSnappedIndex!].fcmToken
+                    receiverFcmToken = friendViewModel.friends[lastSnappedIndex!].fcmToken
                     print("receiverFcmToken: \(String(describing: receiverFcmToken))")
                 } else {
                     print("lastSnappedIndex is nil")
