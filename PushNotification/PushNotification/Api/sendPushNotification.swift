@@ -1,4 +1,6 @@
 import Foundation
+import SwiftUI
+import UIKit
 
 func sendPushNotification(from senderFcmToken: String, to receiverFcmToken: String, senderUid: String, receiverUid: String) {
     guard let url = URL(string: "https://us-central1-tentenios.cloudfunctions.net/sendPushNotification") else {
@@ -54,12 +56,15 @@ func sendPushNotification(from senderFcmToken: String, to receiverFcmToken: Stri
                 if let senderLivekitToken = json["senderLivekitToken"] as? String,
                    let channelUUIDString = json["channelUUID"] as? String,
                    let channelUUID = UUID(uuidString: channelUUIDString) {
-                    AudioStreamManager.shared.joinChannel(
-                        channelUUID: channelUUID,
-                        livekitToken: senderLivekitToken,
-                        senderFcmToken: senderFcmToken,
-                        receiverFcmToken: receiverFcmToken
-                    )
+                    DispatchQueue.main.async {
+                        AudioStreamManager.shared.joinChannel(
+                            channelUUID: channelUUID,
+                            livekitToken: senderLivekitToken,
+                            senderFcmToken: senderFcmToken,
+                            receiverFcmToken: receiverFcmToken
+                        )
+                        presentWalkieTalkieUI()
+                    }
                 }
             } else {
                 print("Invalid JSON received from the server")
@@ -70,4 +75,25 @@ func sendPushNotification(from senderFcmToken: String, to receiverFcmToken: Stri
     }
     
     task.resume()
+}
+
+private func presentWalkieTalkieUI() {
+    guard let windowScene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
+          let window = windowScene.windows.first(where: { $0.isKeyWindow }) else {
+        print("No active window scene found")
+        return
+    }
+    
+    let walkieTalkieView = WalkieTalkieView()
+    let hostingController = UIHostingController(rootView: walkieTalkieView)
+    
+    if let rootViewController = window.rootViewController {
+        if let presentedViewController = rootViewController.presentedViewController {
+            presentedViewController.present(hostingController, animated: true)
+        } else {
+            rootViewController.present(hostingController, animated: true)
+        }
+    } else {
+        print("No root view controller found")
+    }
 }
