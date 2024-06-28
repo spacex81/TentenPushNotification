@@ -2,6 +2,7 @@ import SwiftUI
 import SDWebImageSwiftUI
 import FirebaseAuth
 import FirebaseFirestore
+import FirebaseMessaging
 import Combine
 
 struct ShowAddViewButton: View {
@@ -82,8 +83,18 @@ struct FriendsScrollView: View {
                                         }
                                     }
                                     .onTapGesture {
-                                        if let token = receiverFcmToken {
-                                            sendPushNotification(to: token, senderUid: senderUid ?? "", receiverUid: receiverUid ?? "")
+                                        if let receiverFcmToken = receiverFcmToken {
+                                            Messaging.messaging().token { token, error in
+                                                if let error = error {
+                                                    print("Error fetching FCM token: \(error)")
+                                                    return
+                                                }
+                                                guard let senderFcmToken = token else {
+                                                    print("FCM token is not available in FriendsScrollView")
+                                                    return
+                                                }
+                                                sendPushNotification(from: senderFcmToken,to: receiverFcmToken, senderUid: senderUid ?? "", receiverUid: receiverUid ?? "")
+                                            }
                                         } else {
                                             print("No FCM token available")
                                         }

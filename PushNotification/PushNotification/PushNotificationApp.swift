@@ -2,8 +2,12 @@ import SwiftUI
 import FirebaseCore
 import FirebaseMessaging
 import UserNotifications
+import PushKit
 
-class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
+class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate, PKPushRegistryDelegate {
+    
+    var window: UIWindow?
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         FirebaseApp.configure()
         
@@ -22,17 +26,77 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
         Messaging.messaging().delegate = self
         
+        registerForVoIPPushNotifications()
         return true
+    }
+    
+    private func registerForVoIPPushNotifications() {
+        let registry = PKPushRegistry(queue: DispatchQueue.main)
+        registry.delegate = self
+        registry.desiredPushTypes = [.voIP]
+    }
+    
+    func pushRegistry(_ registry: PKPushRegistry, didUpdate pushCredentials: PKPushCredentials, for type: PKPushType) {
+        print("Push credentials updated: \(pushCredentials.token.map { String(format: "%02x", $0) }.joined())")
+    }
+    
+    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
+        print("VoIP push notification received")
+        let userInfo = payload.dictionaryPayload
+        handlePushNotification(userInfo: userInfo)
+        completion()
+    }
+    
+    private func handlePushNotification(userInfo: [AnyHashable: Any]) {
+        print("Push Notification received!")
+        print(userInfo)
+
+        if let ephemeralPushToken = userInfo["ephemeralPushToken"] as? String {
+            print("Received ephemeral push token: \(ephemeralPushToken)")
+            handleEphemeralPushToken(ephemeralPushToken)
+        } else if let channelUUIDString = userInfo["channelUUID"] as? String,
+                  let channelUUID = UUID(uuidString: channelUUIDString),
+                  let livekitToken = userInfo["livekitToken"] as? String,
+                  let senderFcmToken = userInfo["senderFcmToken"] as? String,
+                  let receiverFcmToken = userInfo["receiverFcmToken"] as? String {
+            print("Received channel information: channelUUID = \(channelUUID), livekitToken = \(livekitToken)")
+            DispatchQueue.main.async {
+                AudioStreamManager.shared.joinChannel(channelUUID: channelUUID, livekitToken: livekitToken, senderFcmToken: senderFcmToken, receiverFcmToken: receiverFcmToken)
+                self.presentWalkieTalkieUI()
+            }
+        } else {
+            print("Unknown notification type")
+        }
+    }
+    
+    private func presentWalkieTalkieUI() {
+        guard let windowScene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
+              let window = windowScene.windows.first(where: { $0.isKeyWindow }) else {
+            print("No active window scene found")
+            return
+        }
+        
+        let walkieTalkieView = WalkieTalkieView()
+        let hostingController = UIHostingController(rootView: walkieTalkieView)
+        
+        if let rootViewController = window.rootViewController {
+            if let presentedViewController = rootViewController.presentedViewController {
+                presentedViewController.present(hostingController, animated: true)
+            } else {
+                rootViewController.present(hostingController, animated: true)
+            }
+        } else {
+            print("No root view controller found")
+        }
     }
 
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         Messaging.messaging().apnsToken = deviceToken
-        print("APNs token received: \(deviceToken)")
+        print("APNs token received: \(deviceToken.map { String(format: "%02x", $0) }.joined())")
     }
 
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         print("Firebase registration token: \(String(describing: fcmToken))")
-        // Notify about the new FCM token
         let dataDict: [String: String] = ["token": fcmToken ?? ""]
         NotificationCenter.default.post(name: Notification.Name("FCMToken"), object: nil, userInfo: dataDict)
     }
@@ -49,24 +113,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         }
     }
     
-    private func handlePushNotification(userInfo: [AnyHashable: Any]) {
-        print(userInfo)
-        print("Push Notification received!")
-        print("channelUUID: \(String(describing: userInfo["channelUUID"]))")
-        print("livekitToken: \(String(describing: userInfo["livekitToken"]))")
-
-        guard let channelUUIDString = userInfo["channelUUID"] as? String,
-              let channelUUID = UUID(uuidString: channelUUIDString) else {
-            print("Invalid or missing channelUUID")
-            return
-        }
-
-        guard let livekitToken = userInfo["livekitToken"] as? String else {
-            print("Invalid or missing livekitToken")
-            return
-        }
-        
-        AudioStreamManager.shared.joinChannel(channelUUID: channelUUID, livekitToken: livekitToken)
+    private func handleEphemeralPushToken(_ ephemeralPushToken: String) {
+        print("Handling ephemeral push token: \(ephemeralPushToken)")
+        // Example action: AudioStreamManager.shared.useEphemeralPushToken(ephemeralPushToken)
     }
 }
 
@@ -80,3 +129,4 @@ struct PushNotificationApp: App {
         }
     }
 }
+
