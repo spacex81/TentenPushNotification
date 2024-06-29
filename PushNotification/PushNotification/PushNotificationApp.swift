@@ -2,9 +2,9 @@ import SwiftUI
 import FirebaseCore
 import FirebaseMessaging
 import UserNotifications
-import PushKit
 
-class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate, PKPushRegistryDelegate {
+class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
+
     
     var window: UIWindow?
     
@@ -26,25 +26,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
         Messaging.messaging().delegate = self
         
-        registerForVoIPPushNotifications()
         return true
-    }
-    
-    private func registerForVoIPPushNotifications() {
-        let registry = PKPushRegistry(queue: DispatchQueue.main)
-        registry.delegate = self
-        registry.desiredPushTypes = [.voIP]
-    }
-    
-    func pushRegistry(_ registry: PKPushRegistry, didUpdate pushCredentials: PKPushCredentials, for type: PKPushType) {
-        print("Push credentials updated: \(pushCredentials.token.map { String(format: "%02x", $0) }.joined())")
-    }
-    
-    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
-        print("VoIP push notification received")
-        let userInfo = payload.dictionaryPayload
-        handlePushNotification(userInfo: userInfo)
-        completion()
     }
     
     private func handlePushNotification(userInfo: [AnyHashable: Any]) {

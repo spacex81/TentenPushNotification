@@ -1,0 +1,3 @@
+the current problem is the receiver doesn't play audio when the app is in the background
+the key is not pushtotalk push notificaiton 
+the key is to make the code run in the background
